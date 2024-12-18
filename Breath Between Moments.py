@@ -15,7 +15,6 @@ FPS = 60
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DIM_WHITE = (150, 150, 150)
 
 # Player settings
 PLAYER_SPEED = 5
@@ -30,8 +29,8 @@ NUM_PLATFORMS = 6
 font = pygame.font.SysFont("Arial", 24)
 
 # Generate starry background
-STAR_COUNT = 150
-stars = [(random.randint(0, WIDTH), random.randint(0, HEIGHT), random.randint(1, 3)) for _ in range(STAR_COUNT)]
+STAR_COUNT = 100
+stars = [(random.randint(0, WIDTH), random.randint(0, HEIGHT)) for _ in range(STAR_COUNT)]
 
 # Load images
 player_image = pygame.image.load("player.png")
@@ -46,12 +45,10 @@ platform_image = pygame.transform.scale(platform_image, (PLATFORM_WIDTH, PLATFOR
 
 # Functions
 def draw_starry_background(surface):
-    """Draw a starry background with distant and dim stars."""
+    """Draw a starry background."""
     surface.fill(BLACK)
-    for i, star in enumerate(stars):
-        star_x, star_y, star_size = star
-        stars[i] = (star_x, (star_y + 1) % HEIGHT, star_size)  # Reverse movement direction for stars
-        pygame.draw.circle(surface, DIM_WHITE, (star_x, star_y), star_size)  # Dim and varying star sizes
+    for star in stars:
+        pygame.draw.circle(surface, WHITE, star, 2)  # Draw small white circles as stars
 
 def display_score(surface, score):
     """Display the score on the screen."""
@@ -75,7 +72,7 @@ class Platform(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def _init_(self, x, y):
         super()._init_()
-        self.image = pygame.transform.flip(player_image, True, False)  # Flip player horizontally
+        self.image = player_image
         self.rect = self.image.get_rect(center=(x, y))
         self.velocity_y = 0
         self.can_jump = True  # Can jump when touching a platform
