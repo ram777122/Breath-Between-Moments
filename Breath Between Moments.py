@@ -15,6 +15,7 @@ FPS = 60
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+DIM_WHITE = (150, 150, 150)
 
 # Player settings
 PLAYER_SPEED = 5
@@ -29,8 +30,8 @@ NUM_PLATFORMS = 6
 font = pygame.font.SysFont("Arial", 24)
 
 # Generate starry background
-STAR_COUNT = 100
-stars = [(random.randint(0, WIDTH), random.randint(0, HEIGHT)) for _ in range(STAR_COUNT)]
+STAR_COUNT = 150
+stars = [(random.randint(0, WIDTH), random.randint(0, HEIGHT), random.randint(1, 3)) for _ in range(STAR_COUNT)]
 
 # Load images
 player_image = pygame.image.load("player.png")
@@ -45,10 +46,12 @@ platform_image = pygame.transform.scale(platform_image, (PLATFORM_WIDTH, PLATFOR
 
 # Functions
 def draw_starry_background(surface):
-    """Draw a starry background."""
+    """Draw a starry background with distant and dim stars."""
     surface.fill(BLACK)
-    for star in stars:
-        pygame.draw.circle(surface, WHITE, star, 2)  # Draw small white circles as stars
+    for i, star in enumerate(stars):
+        star_x, star_y, star_size = star
+        stars[i] = (star_x, (star_y + 1) % HEIGHT, star_size)  # Reverse movement direction for stars
+        pygame.draw.circle(surface, DIM_WHITE, (star_x, star_y), star_size)  # Dim and varying star sizes
 
 def display_score(surface, score):
     """Display the score on the screen."""
@@ -57,8 +60,8 @@ def display_score(surface, score):
 
 # Platform Class
 class Platform(pygame.sprite.Sprite):
-    def _init_(self, x, y, width=PLATFORM_WIDTH):
-        super()._init_()
+    def __init__(self, x, y, width=PLATFORM_WIDTH):
+        super().__init__()
         self.image = pygame.transform.scale(platform_image, (width, PLATFORM_HEIGHT))
         self.rect = self.image.get_rect(topleft=(x, y))
 
@@ -70,9 +73,9 @@ class Platform(pygame.sprite.Sprite):
 
 # Player Class
 class Player(pygame.sprite.Sprite):
-    def _init_(self, x, y):
-        super()._init_()
-        self.image = player_image
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.transform.flip(player_image, True, False)  # Flip player horizontally
         self.rect = self.image.get_rect(center=(x, y))
         self.velocity_y = 0
         self.can_jump = True  # Can jump when touching a platform
@@ -199,5 +202,5 @@ def main():
     pygame.display.flip()
     pygame.time.wait(3000)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
